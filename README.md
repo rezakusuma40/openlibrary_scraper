@@ -1,6 +1,6 @@
 # OpenLibrary Book Scraper
 
-This project consists of two modular web scrapers designed to extract book data from [**OpenLibrary.org**](https://openlibrary.org/).
+This project consists of two modular web scrapers designed to extract book data from [OpenLibrary.org](https://openlibrary.org/).
 
 ## Eligibility of Scraping
 
@@ -38,7 +38,7 @@ This project consists of two modular web scrapers designed to extract book data 
 
 ## Dependencies
 
-- Python 3.11 or newer (older versions have not been tested)
+- Python 3.11 or newer (older versions have not been tested, should work if not too old)
 - All required libraries are listed in `requirements.txt`
 
 ## Setup Instructions
