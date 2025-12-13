@@ -1,7 +1,7 @@
 import os
 
 # IO
-output_folder = 'data'
+output_folder = 'output'
 html_folder = 'html'
 os.makedirs(output_folder, exist_ok=True)
 os.makedirs(html_folder, exist_ok=True)
@@ -11,7 +11,7 @@ output_path = f'{output_folder}/{output_file}'
 # run options
 use_backup = 1 # 0 = False, 1 = True
 skip_scraped = 1 # 0 = False, 1 = True
-max_page = 80 # use any number lower than/not divisible by 20 if you want to scrape all page
+max_page = 40 # stop scraping until reaching this number. use very large number if you want to scrape all page
 use_cookies = 0 # 0 = False, 1 = True
 use_headers = 0 # 0 = False, 1 = True
 use_proxies = 0 # 0 = False, 1 = True

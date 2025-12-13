@@ -1,2 +1,4 @@
 venv/
-data/
+output/
+# pkg/__pycache__/
+# script/__pycache__/

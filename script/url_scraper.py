@@ -15,39 +15,53 @@ def scrape_url(book_tag, page, page_books):
     book_dict['page'] = page
     book_dict['is_scraped'] = False
     book_dict['source_url'] = f"https://openlibrary.org{book_tag.a['href']}"
+    # these commented lines works but not used, since some data are corrupted
+    # we scrape title & image url from book's page instead since it's more reliable
     # book_dict['title'] = book_tag.img['title']
     # book_dict['image_url'] = f"https:{book_tag.img['src']}"
     page_books.append(book_dict)    
 
 def scrape_books(all_books):
-    """for looping over pages. colllecting url via scrape_url()"""
+    """
+    Iterates over paginated endpoints and collects book URLs using `scrape_url()`.
+
+    Each page URL corresponds to a hidden API request used by the trending books
+    carousel on https://openlibrary.org/. By modifying the base URL, the same logic
+    can be reused to scrape other categories such as "classic books" or "books we love".
+
+    Each page returns data for 20 books and contains the HTML fragments rendered
+    on the page. The HTML structure is consistent across all books. Although the
+    first page has a slightly different raw format, it becomes uniform after parsing.
+    """
     page = all_books[-1]['page'] + 20 if all_books else 0
     while page <= config.max_page:
         if page != 0:
             page_books = []
             page_url = 'https://openlibrary.org/partials.json?_component=CarouselLoadMore&queryType=SEARCH&q=trending_score_hourly_sum%3A%5B1+TO+*%5D+readinglog_count%3A%5B4+TO+*%5D+language%3Aeng+-subject%3A%22content_warning%3Acover%22+-subject%3A%22content_warning%3Acover%22&limit=20&page={page}&sorts=trending&subject=&pageMode=offset&hasFulltextOnly=false&secondaryAction=false&key=trending'
-            # page_url = 'https://openlibrary.org/partials.json?_component=CarouselLoadMore&queryType=SEARCH&q=trending_score_hourly_sum%3A%5B1+TO+*%5D+readinglog_count%3A%5B4+TO+*%5D+language%3Aeng+-subject%3A%22content_warning%3Acover%22+-subject%3A%22content_warning%3Acover%22&limit=20&page=20&sorts=trending&subject=&pageMode=offset&hasFulltextOnly=false&secondaryAction=false&key=trending' # example, change page number to debug
+            # page_url = 'https://openlibrary.org/partials.json?_component=CarouselLoadMore&queryType=SEARCH&q=trending_score_hourly_sum%3A%5B1+TO+*%5D+readinglog_count%3A%5B4+TO+*%5D+language%3Aeng+-subject%3A%22content_warning%3Acover%22+-subject%3A%22content_warning%3Acover%22&limit=20&page=20&sorts=trending&subject=&pageMode=offset&hasFulltextOnly=false&secondaryAction=false&key=trending' # clickable example, change page number to debug
+            print(page, end = ' ')
             resp = request.retriable_requests(page_url.format(page=page))
             books = json.loads(resp.text)['partials']
             for book in books:
                 if config.save_html:
-                    with open(f'{config.html_folder}/next_page.html', 'w', encoding='utf-8') as f:
+                    with open(f'{config.html_folder}/other_page.html', 'w', encoding='utf-8') as f:
                         f.write(book)
                     config.save_html = False
-                soup = BeautifulSoup(book, 'lxml')
+                soup = BeautifulSoup(book, 'html.parser')
                 scrape_url(soup, page, page_books)
             all_books.extend(page_books)
             if len(books) < 20:
-                break # < 20 books indicates last page
+                break # < 20 books indicates last page or it's next empty page if last page has 20 books
         else:
             page_books = []
             page_url = 'https://openlibrary.org/partials.json?_component=LazyCarousel&query=trending_score_hourly_sum%3A%5B1+TO+*%5D+readinglog_count%3A%5B4+TO+*%5D+language%3Aeng+-subject%3A%22content_warning%3Acover%22&sort=trending&key=trending&limit=20&search=false&has_fulltext_only=false&layout=carousel&fallback=false&title=Trending+Books'
+            print(page, end = ' ')
             resp = request.retriable_requests(page_url)
             resp = json.loads(resp.text)['partials']
             if config.save_html:
                 with open(f'{config.html_folder}/first_page.html', 'w', encoding='utf-8') as f:
                     f.write(resp)
-            soup = BeautifulSoup(resp, 'lxml')
+            soup = BeautifulSoup(resp, 'html.parser')
             books = soup.select('.book-cover')
             for book in books:
                 scrape_url(book, 0, page_books)

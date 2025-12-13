@@ -10,11 +10,12 @@ from pkg import config, io, request
 
 def scrape_details(all_books):
     """for scraping book data other than url"""
-    for book_dict in all_books:
+    for i, book_dict in enumerate(all_books):
         if book_dict['is_scraped'] is True:
             continue
+        print(i, end= ' ')
         resp = request.retriable_requests(book_dict['source_url'])
-        soup = BeautifulSoup(resp.content, 'lxml')
+        soup = BeautifulSoup(resp.content, 'html.parser')
         book_dict['title_alt'] = (
             soup.select_one(
                 '.work-title'
@@ -61,8 +62,8 @@ if __name__ == "__main__":
     try:
         all_books = io.get_backup()
         if not config.skip_scraped:
-            for book in all_books:
-                book['is_scraped'] = False # 
+            for book_dict in all_books:
+                book_dict['is_scraped'] = False
         start = time.perf_counter()
         scrape_details(all_books)
     except (Exception, KeyboardInterrupt) as e:

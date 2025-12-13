@@ -9,7 +9,11 @@ def get_backup():
     try:
         with open(f"{config.output_path}.json", "r", encoding="utf-8") as f:
             all_books = json.load(f)
-        print(f"loaded {len(all_books)} books")
+        unscraped_count = sum(
+            1 for book_dict in all_books 
+            if not book_dict.get("is_scraped")
+        )
+        print(f"loaded {len(all_books)} books, {unscraped_count} books has not yet been scraped")
     except Exception:
         all_books = []
     return all_books
