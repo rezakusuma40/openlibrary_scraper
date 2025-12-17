@@ -22,8 +22,8 @@ This project consists of two modular web scrapers designed to extract book data 
 │
 ├── pkg/
 │   ├── __pycache__
-│   ├── request.py            # modified_requests(), retriable_requests()
-│   ├── io.py                 # get_backup(), save_to_csv(), save_to_json()
+│   ├── request.py            # Contains functions that add extra functionalities to basic requests
+│   ├── io.py                 # Contains functions for input/output tasks
 │   └── config.py             # Adjustable business logic / settings
 │
 ├── script/
